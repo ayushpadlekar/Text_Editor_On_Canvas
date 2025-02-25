@@ -7,7 +7,7 @@
 An Android app to create, edit or modify text upon a square canvas. It can be used to create personalized text-based designs or writing Quotes. </br>
 (*This app was made as an assignment for an insternship.*) </br>
 
-This is a Single Activity App - *[MainActivity.kt](app\src\main\java\com\ayushxp\texteditoroncanvasapp\MainActivity.kt)*
+This is a Single Activity App - *[MainActivity.kt](app/src/main/java/com/ayushxp/texteditoroncanvasapp/MainActivity.kt)*
 
 <p><b>Download & Test the app in your phone ⬇️</b> </br>
 https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.0.0
