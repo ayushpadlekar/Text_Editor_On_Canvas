@@ -28,9 +28,9 @@ https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.0.0
 ## Screenshots 📸
 
 <table>
-<tr>
-    <td>Light Mode</td>
-    <td>Dark Mode</td>
+<tr align = "center">
+    <td>Light Mode ☀️</td>
+    <td>Dark Mode 🌙</td>
 </tr>
 <tr>
     <td><img src="screenshots\TE Canvas UI - Light mode.png" width=300></td>
