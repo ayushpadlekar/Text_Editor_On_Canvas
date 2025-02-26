@@ -1,5 +1,5 @@
 <div align="left">
-    <img src="screenshots\TE Canvas Logo & Title.png" alt="App Logo" width="350">
+    <img src="screenshots\TE Canvas Logo & Title.png" alt="App Logo" width="500">
 </div>
 
 # Text Editor on Canvas - Android App
@@ -13,6 +13,7 @@ This is a Single Activity App - *[MainActivity.kt](app/src/main/java/com/ayushxp
 https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.0.0
 </p>
 
+
 ## Features 💡
 
 * Add and edit text on a square canvas.
@@ -23,20 +24,20 @@ https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.0.0
 * Undo & Redo functionality.
 * Dark Mode option.
 
-## Screenshots 📸
 
+## Screenshots 📸
 
 <table>
 <tr>
-<td>Light Mode</td>
-<td>Dark Mode</td>
+    <td>Light Mode</td>
+    <td>Dark Mode</td>
 </tr>
-
 <tr>
-<td><img src="screenshots\TE Canvas UI - Light mode.png" width=480></td>
-<td><img src="screenshots\TE Canvas UI - Dark mode.png" width=480></td>
+    <td><img src="screenshots\TE Canvas UI - Light mode.png" width=300></td>
+    <td><img src="screenshots\TE Canvas UI - Dark mode.png" width=300></td>
 </tr>
 </table>
+
 
 ## Tech Stack 🛠️
 
