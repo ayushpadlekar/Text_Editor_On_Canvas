@@ -4,14 +4,32 @@
 
 # Text Editor on Canvas - Android App
 
-An Android app to create, edit or modify text upon a square canvas. It can be used to create personalized text-based designs or writing Quotes. </br>
-(*This app was made as an assignment for an insternship.*) </br>
+An Android app to create, edit or modify text upon a square canvas. It can be used to create personalized text-based designs or to write some Quotes. </br>
 
-This is a Single Activity App - *[MainActivity.kt](app/src/main/java/com/ayushxp/texteditoroncanvasapp/MainActivity.kt) (~ 1300 lines)*
+This is a Single Activity App :- &nbsp; ***[MainActivity.kt](app/src/main/java/com/ayushxp/texteditoroncanvasapp/MainActivity.kt)** &nbsp;(~1300 lines)*
 
-<p><b>Download & Test the app in your phone ⬇️</b> </br>
+<p><b>• Download & Test the app in your phone ⬇️</b> </br>
 https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.0.0
 </p>
+
+</br>
+
+> [!NOTE]
+> *- This app was made as an assignment for an insternship. </br> - The main challenge of the assignment was : to make the Text stay inside of the square canvas. It should not go outside the boundary whenever we drag or move the text.* </br>
+
+> <ins><b> How I solved this challenge</b></ins> :- </br>
+> <p> - I understood the problem carefully and analyzed what we have & what can be done. </br>
+> - The text has its co-ordinates position on the canvas. When we drag the text, the touch-pointer-gesture assigns new X & Y co-ordinates to the text. </br>
+> 
+> • So, I used my logic & applied constraints on each side of the square canvas that : </br>
+> &nbsp; - if new-coordinates of text try to go outside the square boundary coordinates, then new-coordinates = boundary coordinates. </br>
+> &nbsp; - which means the new-coordinates cannot go beyond the boundary-coordinates. </br>
+> - Example code snippet :
+> <pre>
+>   if (new-coordinate < boundary-coordinate) {
+>       new-coordinate = boundary-coordinate
+>   }
+> </pre> </p>
 
 
 ## Features 💡
@@ -41,7 +59,7 @@ https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.0.0
 
 ## Tech Stack 🛠️
 
-* **Jetpack Compose :** Developed easy to use, modern & sleek UI. Extensively used upon Title of the App.
+* **Jetpack Compose :** Developed easy to use, modern & sleek UI design. Extensively used for designing the Title of the App.
 
 * **Kotlin :** Utilized as the primary programming language for the app. Created dynamic features with mutable states & undo redo stacks management.
 
