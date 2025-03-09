@@ -19,9 +19,9 @@ https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.0.0
 
 > <ins><b> How I solved this challenge</b></ins> :- </br>
 > <p> - I understood the problem carefully and analyzed what we have & what can be done. </br>
-> - The text has its co-ordinates position on the canvas. When we drag the text, the touch-pointer-gesture assigns new X & Y co-ordinates to the text. </br>
+> - As we know, the square canvas have it's own coordinates (starting from 0,0 in the top-left). And the text has its co-ordinates position upon that canvas. When we drag the text, the touch-pointer-gesture assigns new X & Y co-ordinates to the text constantly. </br>
 > 
-> • So, I used my logic & applied constraints on each side of the square canvas that : </br>
+> • So, I used my logic & applied constraints on each boundary sides of the square canvas that : </br>
 > &nbsp; - if new-coordinates of text try to go outside the square boundary coordinates, then new-coordinates = boundary coordinates. </br>
 > &nbsp; - which means the new-coordinates cannot go beyond the boundary-coordinates. </br>
 > - Example code snippet :
@@ -30,13 +30,9 @@ https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.0.0
 >       new-coordinate = boundary-coordinate
 >   }
 > </pre> </p>
+> 🙃 Fun Fact :- Even AI was not able to solve it. I tried 3 popular AIs, all of them struggled alot & were giving half-baked solutions. Sometimes the text was going out of bounds from the right boundary, sometimes from another boundary.
 
-😼 Fun fact
-
-🙃 Fun fact
-
-😉 Fun fact
-
+</br>
 
 ## Features 💡
 
