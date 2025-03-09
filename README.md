@@ -31,6 +31,12 @@ https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.0.0
 >   }
 > </pre> </p>
 
+😼 Fun fact
+
+🙃 Fun fact
+
+😉 Fun fact
+
 
 ## Features 💡
 
