@@ -30,7 +30,6 @@ https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.0.0
 >       new-coordinate = boundary-coordinate
 >   }
 > </pre> </p>
-> 🙃 Fun Fact :- Even AI was not able to solve it. I tried 3 popular AIs, all of them struggled alot & were giving half-baked solutions. Sometimes the text was going out of bounds from the right boundary, sometimes from another boundary.
 
 </br>
 
