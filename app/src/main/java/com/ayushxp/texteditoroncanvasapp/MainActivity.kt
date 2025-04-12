@@ -19,8 +19,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -118,6 +120,9 @@ fun TextDragApp() {
     var infoTextCol by remember { mutableStateOf(Color.Black) }
     var colorsBorder by remember { mutableStateOf(Color.Black) }
 
+    // Scroll state
+    val scrollState = rememberScrollState()
+
 
     //------ Undo Redo states & stacks -----------------------------------------------------------------
     data class ActionStates(
@@ -165,7 +170,7 @@ fun TextDragApp() {
     // Undo function
     fun undo() {
         if (undoStack.isNotEmpty()) {
-            val lastAction = undoStack.removeLast()
+            val lastAction = undoStack.removeAt(undoStack.lastIndex)
             redoStack.add(
                 ActionStates(
                     textToDisplay,
@@ -182,10 +187,10 @@ fun TextDragApp() {
         }
     }
 
-    // Undo function
+    // Redo function
     fun redo() {
         if (redoStack.isNotEmpty()) {
-            val nextState = redoStack.removeLast()
+            val nextState = redoStack.removeAt(redoStack.lastIndex)
             undoStack.add(
                 ActionStates(
                     textToDisplay,
@@ -202,12 +207,19 @@ fun TextDragApp() {
         }
     }
 
+    fun changeTextColor(newColor: Color) {
+        if (textCol != newColor) {
+            saveActionState()
+            textCol = newColor
+        }
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     // Main Column
     Column(
         modifier = Modifier
-            .fillMaxSize().background(if (isDarkMode) Color.Black else Color.White),
+            .fillMaxSize().background(if (isDarkMode) Color.Black else Color.White).verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(55.dp))
@@ -818,9 +830,7 @@ fun TextDragApp() {
             // Black color
             Button(
                 onClick = {
-                    if (textCol != Color.Black)
-                        saveActionState()
-                    textCol = Color.Black
+                    changeTextColor(Color.Black)
                 },
                 colors = ButtonDefaults.buttonColors(Color.Black),
                 shape = CircleShape,
@@ -840,8 +850,7 @@ fun TextDragApp() {
             // White color
             Button(
                 onClick = {
-                    saveActionState()
-                    textCol = Color.White
+                    changeTextColor(Color.White)
                 },
                 colors = ButtonDefaults.buttonColors(Color.White),
                 shape = CircleShape,
@@ -861,8 +870,7 @@ fun TextDragApp() {
             // Light Gray color
             Button(
                 onClick = {
-                    saveActionState()
-                    textCol = Color.LightGray
+                    changeTextColor(Color.LightGray)
                 },
                 colors = ButtonDefaults.buttonColors(Color.LightGray),
                 shape = CircleShape,
@@ -882,8 +890,7 @@ fun TextDragApp() {
             // Gray color
             Button(
                 onClick = {
-                    saveActionState()
-                    textCol = Color.Gray
+                    changeTextColor(Color.Gray)
                 },
                 colors = ButtonDefaults.buttonColors(Color.Gray),
                 shape = CircleShape,
@@ -911,8 +918,7 @@ fun TextDragApp() {
             // Red color
             Button(
                 onClick = {
-                    saveActionState()
-                    textCol = Color.Red
+                    changeTextColor(Color.Red)
                 },
                 colors = ButtonDefaults.buttonColors(Color.Red),
                 shape = CircleShape,
@@ -931,8 +937,7 @@ fun TextDragApp() {
             // Yellow color
             Button(
                 onClick = {
-                    saveActionState()
-                    textCol = Color.Yellow
+                    changeTextColor(Color.Yellow)
                 },
                 colors = ButtonDefaults.buttonColors(Color.Yellow),
                 shape = CircleShape,
@@ -950,8 +955,7 @@ fun TextDragApp() {
             // Orange color - FF8000
             Button(
                 onClick = {
-                    saveActionState()
-                    textCol = Color(0xFFFF8000)
+                    changeTextColor(Color(0xFFFF8000))
                 },
                 colors = ButtonDefaults.buttonColors(Color(0xFFFF8000)),
                 shape = CircleShape,
@@ -970,8 +974,7 @@ fun TextDragApp() {
             // Blue color
             Button(
                 onClick = {
-                    saveActionState()
-                    textCol = Color.Blue
+                    changeTextColor(Color.Blue)
                 },
                 colors = ButtonDefaults.buttonColors(Color.Blue),
                 shape = CircleShape,
@@ -990,8 +993,7 @@ fun TextDragApp() {
             // Cyan color
             Button(
                 onClick = {
-                    saveActionState()
-                    textCol = Color.Cyan
+                    changeTextColor(Color.Cyan)
                 },
                 colors = ButtonDefaults.buttonColors(Color.Cyan),
                 shape = CircleShape,
@@ -1010,8 +1012,7 @@ fun TextDragApp() {
             // Green color - 00CC00
             Button(
                 onClick = {
-                    saveActionState()
-                    textCol = Color(0xFF00CC00)
+                    changeTextColor(Color(0xFF00CC00))
                 },
                 colors = ButtonDefaults.buttonColors(Color(0xFF00CC00)),
                 shape = CircleShape,
@@ -1030,8 +1031,7 @@ fun TextDragApp() {
             // Magenta color
             Button(
                 onClick = {
-                    saveActionState()
-                    textCol = Color.Magenta
+                    changeTextColor(Color.Magenta)
                 },
                 colors = ButtonDefaults.buttonColors(Color.Magenta),
                 shape = CircleShape,
@@ -1060,11 +1060,11 @@ fun TextDragApp() {
                     } else {
                         saveActionState()
                         textToDisplay = inputText
+                        showTextInputDialog = false
                         textPosition = Offset(
                             ((boxSize.width - textSize.width) / 2).toFloat(),
                             ((boxSize.height - textSize.height) / 2).toFloat()
                         )
-                        showTextInputDialog = false
                     }
                 },
                 onDismiss = { showTextInputDialog = false },
