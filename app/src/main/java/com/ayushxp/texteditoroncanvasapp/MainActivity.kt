@@ -38,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -45,14 +46,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -60,6 +66,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.SystemFontFamily
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -1051,7 +1058,7 @@ fun TextDragApp() {
         // Text Input Dialog
         if (showTextInputDialog) {
             TextInputDialog(
-                inputText = inputText,
+                initialText = inputText,
                 onInputTextChange = { inputText = it },
                 onConfirm = {
                     if (inputText.isBlank()) {
@@ -1074,25 +1081,46 @@ fun TextDragApp() {
 
         // Font Size Input Dialog
         if (showFontSizeDialog) {
+
+            // Use TextFieldValue to control cursor position
+            var textFieldValue by remember(inputFontSize) {
+                mutableStateOf(
+                    TextFieldValue(
+                        text = inputFontSize,
+                        selection = TextRange(inputFontSize.length) // Cursor at end
+                    )
+                )
+            }
+            // Create FocusRequester and keyboard controller
+            val focusRequester = remember { FocusRequester() }
+            val keyboardController = LocalSoftwareKeyboardController.current
+
             AlertDialog(
                 onDismissRequest = { showFontSizeDialog = false },
                 title = { Text("Enter Font Size", fontSize = 16.sp) },
                 text = {
                     Column {
                         TextField(
-                            value = inputFontSize,
-                            onValueChange = {
-                                inputFontSize = it
-                                inputFontSizeError =
-                                    if (it.toIntOrNull() == null)
-                                        "Invalid number"
-                                    else if (it.toIntOrNull() !in 1..200)
-                                        "Enter a number between 1 to 200 only."
-                                    else null
+                            value = textFieldValue,
+                            onValueChange = { newValue ->
+                                textFieldValue = newValue
+                                inputFontSize = newValue.text // Update raw text
+                                inputFontSizeError = when {
+                                    newValue.text.toIntOrNull() == null -> "Invalid number"
+                                    newValue.text.toIntOrNull() !in 1..200 -> "Enter a number between 1 to 200 only."
+                                    else -> null
+                                }
                             },
                             label = { Text("1 to 200") },
                             isError = inputFontSizeError != null,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier // Request focus when the dialog appears
+                                .focusRequester(focusRequester)
+                                .onFocusChanged { focusState ->
+                                    if (focusState.isFocused) { // Show keyboard when focused
+                                        keyboardController?.show()
+                                    }
+                                }
                         )
                         if (inputFontSizeError != null) {
                             Text(
@@ -1124,6 +1152,11 @@ fun TextDragApp() {
                     }
                 }
             )
+            // Auto-focus when the dialog is displayed
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+                keyboardController?.show()
+            }
         }
     }
 
@@ -1168,22 +1201,46 @@ fun DropdownButton(
 
 @Composable
 fun TextInputDialog(
-    inputText: String,
+    initialText: String,
     onInputTextChange: (String) -> Unit,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     inputError: String?,
 ) {
+    // Use TextFieldValue instead of String to control cursor position
+    var textFieldValue by remember(initialText) {
+        mutableStateOf(
+            TextFieldValue(
+                text = initialText,
+                selection = TextRange(initialText.length) // Cursor at the end
+            )
+        )
+    }
+
+    // Create FocusRequester and keyboard controller
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Enter Text") },
         text = {
             Column {
                 TextField(
-                    value = inputText,
-                    onValueChange = onInputTextChange,
+                    value = textFieldValue,
+                    onValueChange = { newValue ->
+                        textFieldValue = newValue
+                        onInputTextChange(newValue.text) // Pass only the raw text back
+                    },
                     label = { Text("Text") },
-                    isError = inputError != null // Highlight the text field if there's an error
+                    isError = inputError != null,
+                    modifier = Modifier // Request focus when the dialog appears
+                        .focusRequester(focusRequester)
+                        .onFocusChanged { focusState ->
+                            if (focusState.isFocused) { // Show keyboard when focused
+                                keyboardController?.show()
+                            }
+                        }
                 )
                 if (inputError != null) {
                     Text(
@@ -1205,6 +1262,11 @@ fun TextInputDialog(
             }
         }
     )
+    // Auto-focus when the dialog is displayed
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+        keyboardController?.show()
+    }
 }
 
 
