@@ -1,6 +1,11 @@
 package com.ayushxp.texteditoroncanvasapp
 
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -54,6 +59,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
@@ -214,10 +220,29 @@ fun TextDragApp() {
         }
     }
 
+    // Change text color function
     fun changeTextColor(newColor: Color) {
         if (textCol != newColor) {
             saveActionState()
             textCol = newColor
+        }
+    }
+
+    // Vibrations on button click ------------
+    val vibrator: Vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val vibratorManager: VibratorManager =
+            LocalContext.current.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+        vibratorManager.getDefaultVibrator()
+    } else {
+        @Suppress("DEPRECATION")  // backward compatibility for Android API < 31
+        LocalContext.current.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    }
+
+    fun vibrate() {  // Vibrate Function ------------
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(40, VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            vibrator.vibrate(40)
         }
     }
 
@@ -226,7 +251,8 @@ fun TextDragApp() {
     // Main Column
     Column(
         modifier = Modifier
-            .fillMaxSize().background(if (isDarkMode) Color.Black else Color.White).verticalScroll(scrollState),
+            .fillMaxSize().background(if (isDarkMode) Color.Black else Color.White)
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(55.dp))
@@ -423,20 +449,24 @@ fun TextDragApp() {
                 painter = painterResource(id = R.drawable.baseline_undo_24),
                 contentDescription = "Undo",
                 tint =
-                if (isDarkMode)
-                    if (undoStack.isNotEmpty())
-                        Color.White
+                    if (isDarkMode)
+                        if (undoStack.isNotEmpty())
+                            Color.White
+                        else
+                            Color.Gray
+                    else if (undoStack.isNotEmpty())
+                        Color.Black
                     else
-                        Color.Gray
-                else if (undoStack.isNotEmpty())
-                    Color.Black
-                else
-                    Color.LightGray,
+                        Color.LightGray,
                 modifier = Modifier.size(30.dp)
-                    .clickable(enabled = if (undoStack.isNotEmpty()) true else false,
+                    .clickable(
+                        enabled = if (undoStack.isNotEmpty()) true else false,
                         onClickLabel = "Undo",
                         role = Role.Button,
-                        onClick = { undo() }
+                        onClick = {
+                            undo()
+                            vibrate()
+                        }
                     )
             )
 
@@ -447,21 +477,24 @@ fun TextDragApp() {
                 painter = painterResource(id = R.drawable.baseline_redo_24),
                 contentDescription = "Redo",
                 tint =
-                if (isDarkMode)
-                    if (redoStack.isNotEmpty())
-                        Color.White
+                    if (isDarkMode)
+                        if (redoStack.isNotEmpty())
+                            Color.White
+                        else
+                            Color.Gray
+                    else if (redoStack.isNotEmpty())
+                        Color.Black
                     else
-                        Color.Gray
-                else if (redoStack.isNotEmpty())
-                    Color.Black
-                else
-                    Color.LightGray,
+                        Color.LightGray,
                 modifier = Modifier.size(30.dp)
                     .clickable(
                         enabled = if (redoStack.isNotEmpty()) true else false,
                         onClickLabel = "Redo",
                         role = Role.Button,
-                        onClick = { redo() }
+                        onClick = {
+                            redo()
+                            vibrate()
+                        }
                     )
             )
 
@@ -495,11 +528,11 @@ fun TextDragApp() {
                         fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
                         fontStyle = if (isItalic) FontStyle.Italic else FontStyle.Normal,
                         textDecoration =
-                        if (isUnderline)
-                            TextDecoration.Underline
-                        else if (isStrikethrough)
-                            TextDecoration.LineThrough
-                        else TextDecoration.None
+                            if (isUnderline)
+                                TextDecoration.Underline
+                            else if (isStrikethrough)
+                                TextDecoration.LineThrough
+                            else TextDecoration.None
                     ),
                     modifier = Modifier
                         .offset { IntOffset(textPosition.x.toInt(), textPosition.y.toInt()) }
@@ -562,13 +595,13 @@ fun TextDragApp() {
                     textToDisplay = ""
                 },
                 colors =
-                if (textToDisplay.isEmpty())
-                    if (isDarkMode)
-                        ButtonDefaults.buttonColors(Color.Black)
+                    if (textToDisplay.isEmpty())
+                        if (isDarkMode)
+                            ButtonDefaults.buttonColors(Color.Black)
+                        else
+                            ButtonDefaults.buttonColors(Color.Gray)
                     else
-                        ButtonDefaults.buttonColors(Color.Gray)
-                else
-                    ButtonDefaults.buttonColors(Color.Black),
+                        ButtonDefaults.buttonColors(Color.Black),
 
                 border = BorderStroke(
                     0.5.dp,
@@ -584,13 +617,13 @@ fun TextDragApp() {
                 Text(
                     "Delete Text",
                     color =
-                    if (isDarkMode)
-                        if (textToDisplay.isEmpty())
-                            Color.Gray
+                        if (isDarkMode)
+                            if (textToDisplay.isEmpty())
+                                Color.Gray
+                            else
+                                Color.White
                         else
-                            Color.White
-                    else
-                        Color.White,
+                            Color.White,
                     fontSize = 16.sp
                 )
             }
@@ -605,6 +638,7 @@ fun TextDragApp() {
                             ((boxSize.width - textSize.width) / 2).toFloat(),
                             ((boxSize.height - textSize.height) / 2).toFloat()
                         )
+                    vibrate()
                 },
                 colors = ButtonDefaults.buttonColors(Color.Black),
                 border = BorderStroke(0.5.dp, Color.White),
@@ -641,6 +675,7 @@ fun TextDragApp() {
                 onClick = {
                     saveActionState()
                     isBold = !isBold
+                    vibrate()
                 },
                 colors = ButtonDefaults.buttonColors(Color.Black),
                 border = BorderStroke(
@@ -661,6 +696,7 @@ fun TextDragApp() {
                 onClick = {
                     saveActionState()
                     isItalic = !isItalic
+                    vibrate()
                 },
                 colors = ButtonDefaults.buttonColors(Color.Black),
                 border = BorderStroke(
@@ -692,6 +728,7 @@ fun TextDragApp() {
                         isStrikethrough = !isStrikethrough
                     }
                     isUnderline = !isUnderline
+                    vibrate()
                 },
                 colors = ButtonDefaults.buttonColors(Color.Black),
                 border = BorderStroke(
@@ -720,6 +757,7 @@ fun TextDragApp() {
                     if (isUnderline)
                         isUnderline = !isUnderline
                     isStrikethrough = !isStrikethrough
+                    vibrate()
                 },
                 colors = ButtonDefaults.buttonColors(Color.Black),
                 border = BorderStroke(
@@ -752,6 +790,7 @@ fun TextDragApp() {
                 onClick = {
                     saveActionState()
                     fontSize = (fontSize.value - 2).sp
+                    vibrate()
                 },
                 colors = ButtonDefaults.buttonColors(Color.Black),
                 border = BorderStroke(0.5.dp, Color.White),
@@ -788,6 +827,7 @@ fun TextDragApp() {
                 onClick = {
                     saveActionState()
                     fontSize = (fontSize.value + 2).sp
+                    vibrate()
                 },
                 colors = ButtonDefaults.buttonColors(Color.Black),
                 border = BorderStroke(0.5.dp, Color.White),
@@ -806,6 +846,7 @@ fun TextDragApp() {
                     if (fontSize != 20.sp)
                         saveActionState()
                     fontSize = 20.sp
+                    vibrate()
                 },
                 colors = ButtonDefaults.buttonColors(Color.Black),
                 border = BorderStroke(0.5.dp, Color.White),
