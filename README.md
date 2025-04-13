@@ -8,8 +8,14 @@
 
 This is a Single Activity App :- &nbsp; ***[MainActivity.kt](app/src/main/java/com/ayushxp/texteditoroncanvasapp/MainActivity.kt)** &nbsp;(~1300 lines)*
 
-<p><b>• Download & Test the app in your phone ⬇️</b> </br>
-https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.0.0
+- <p><b>Download & Test the app in your phone ⬇️</b> </br>
+
+    - Get App directly to your Email account via Firebase App distribution :-
+      https://appdistribution.firebase.google.com/testerapps/1:226247968382:android:d30be6b18985dbf0c23a2f/releases/3b25mh6h9htig?utm_source=firebase-console
+
+    - Download Apk via github releases :-
+      https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.0.0
+
 </p>
 
 </br>
