@@ -14,7 +14,7 @@ This is a Single Activity App :- &nbsp; ***[MainActivity.kt](app/src/main/java/c
       https://appdistribution.firebase.google.com/testerapps/1:226247968382:android:d30be6b18985dbf0c23a2f/releases/11rh6hgdk0dv0?utm_source=firebase-console
 
     - Download Apk via github releases :-
-      https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.0.0
+      https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.1.0
 
 </p>
 
