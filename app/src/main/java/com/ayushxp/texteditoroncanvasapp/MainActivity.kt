@@ -696,22 +696,44 @@ fun TextDragApp() {
             // Bold
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) {
+                    if (textToDisplay.isNotEmpty()) {
                         saveActionState()
                         isBold = !isBold
                         vibrate()
                     }
                 },
-                colors = ButtonDefaults.buttonColors(Color.Black),
+                colors = ButtonDefaults.buttonColors(
+                    if(isDarkMode) {
+                        Color.Black
+                    } else {
+                        if(isBold) {
+                            Color.Black
+                        } else {
+                            Color.White
+                        }
+                    }
+                ),
                 border = BorderStroke(
                     if (isBold) 1.5.dp else 0.5.dp,
-                    Color.White
+                    if(isDarkMode) Color.White else Color.Black
                 ),
                 shape = CircleShape,
                 modifier = Modifier.size(if (isBold) 45.dp else 40.dp),
                 contentPadding = PaddingValues(0.dp)
             ) {
-                Text("B", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("B",
+                    color = if(isDarkMode) {
+                        Color.White
+                    } else {
+                        if(isBold) {
+                            Color.White
+                        } else {
+                            Color.Black
+                        }
+                    },
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             Spacer(modifier = Modifier.size(15.dp))
@@ -719,16 +741,26 @@ fun TextDragApp() {
             //Italic
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) {
+                    if (textToDisplay.isNotEmpty()) {
                         saveActionState()
                         isItalic = !isItalic
                         vibrate()
                     }
                 },
-                colors = ButtonDefaults.buttonColors(Color.Black),
+                colors = ButtonDefaults.buttonColors(
+                    if(isDarkMode) {
+                        Color.Black
+                    } else {
+                        if(isItalic) {
+                            Color.Black
+                        } else {
+                            Color.White
+                        }
+                    }
+                ),
                 border = BorderStroke(
                     if (isItalic) 1.5.dp else 0.5.dp,
-                    Color.White
+                    if(isDarkMode) Color.White else Color.Black
                 ),
                 shape = CircleShape,
                 modifier = Modifier.size(if (isItalic) 45.dp else 40.dp),
@@ -736,7 +768,15 @@ fun TextDragApp() {
             ) {
                 Text(
                     "I",
-                    color = Color.White,
+                    color = if(isDarkMode) {
+                        Color.White
+                    } else {
+                        if(isItalic) {
+                            Color.White
+                        } else {
+                            Color.Black
+                        }
+                    },
                     fontSize = 16.sp,
                     fontFamily = FontFamily.Monospace,
                     fontStyle = FontStyle.Italic,
@@ -750,7 +790,7 @@ fun TextDragApp() {
             // Underline
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) {
+                    if (textToDisplay.isNotEmpty()) {
                         saveActionState()
                         if (isStrikethrough) {
                             isStrikethrough = !isStrikethrough
@@ -759,10 +799,20 @@ fun TextDragApp() {
                         vibrate()
                     }
                 },
-                colors = ButtonDefaults.buttonColors(Color.Black),
+                colors = ButtonDefaults.buttonColors(
+                    if(isDarkMode) {
+                        Color.Black
+                    } else {
+                        if(isUnderline) {
+                            Color.Black
+                        } else {
+                            Color.White
+                        }
+                    }
+                ),
                 border = BorderStroke(
                     if (isUnderline) 1.5.dp else 0.5.dp,
-                    Color.White
+                    if(isDarkMode) Color.White else Color.Black
                 ),
                 shape = CircleShape,
                 modifier = Modifier.size(if (isUnderline) 45.dp else 40.dp),
@@ -770,7 +820,15 @@ fun TextDragApp() {
             ) {
                 Text(
                     "U",
-                    color = Color.White,
+                    color = if(isDarkMode) {
+                        Color.White
+                    } else {
+                        if(isUnderline) {
+                            Color.White
+                        } else {
+                            Color.Black
+                        }
+                    },
                     fontSize = 16.sp,
                     textDecoration = TextDecoration.Underline,
                     modifier = Modifier.offset(0.dp, (-2).dp)
@@ -782,7 +840,7 @@ fun TextDragApp() {
             // Strikethrough / Linethrough
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) {
+                    if (textToDisplay.isNotEmpty()) {
                         saveActionState()
                         if (isUnderline)
                             isUnderline = !isUnderline
@@ -790,10 +848,20 @@ fun TextDragApp() {
                         vibrate()
                     }
                 },
-                colors = ButtonDefaults.buttonColors(Color.Black),
+                colors = ButtonDefaults.buttonColors(
+                    if(isDarkMode) {
+                        Color.Black
+                    } else {
+                        if(isStrikethrough) {
+                            Color.Black
+                        } else {
+                            Color.White
+                        }
+                    }
+                ),
                 border = BorderStroke(
                     if (isStrikethrough) 1.5.dp else 0.5.dp,
-                    Color.White
+                    if(isDarkMode) Color.White else Color.Black
                 ),
                 shape = CircleShape,
                 modifier = Modifier.size(if (isStrikethrough) 45.dp else 40.dp),
@@ -801,7 +869,15 @@ fun TextDragApp() {
             ) {
                 Text(
                     "S",
-                    color = Color.White,
+                    color = if(isDarkMode) {
+                        Color.White
+                    } else {
+                        if(isStrikethrough) {
+                            Color.White
+                        } else {
+                            Color.Black
+                        }
+                    },
                     fontSize = 16.sp,
                     fontFamily = FontFamily.Monospace,
                     textDecoration = TextDecoration.LineThrough,
@@ -819,15 +895,15 @@ fun TextDragApp() {
             // Slider visibility toggle icon button
             Icon(
                 painter = painterResource(id = R.drawable.slidericon),
-                tint = if(isDarkMode) Color.White else Color.Black,
+                tint = if (isDarkMode) Color.White else Color.Black,
                 contentDescription = "Slider Visibility",
                 modifier = Modifier.clickable(
                     enabled = true,
                     onClickLabel = "Slider Visibility",
                     role = Role.Button,
                     onClick = {
-                        if(textToDisplay.isNotEmpty()) {
-                            if(showSlider == false) {
+                        if (textToDisplay.isNotEmpty()) {
+                            if (showSlider == false) {
                                 saveActionState()
                             }
                             showSlider = !showSlider
@@ -842,7 +918,7 @@ fun TextDragApp() {
             // - Button
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) {
+                    if (textToDisplay.isNotEmpty()) {
                         saveActionState()
                         fontSize = (fontSize.value - 2).sp
                         vibrate()
@@ -871,7 +947,7 @@ fun TextDragApp() {
                         role = Role.Button,
                         onClick = {
                             // onclick to show Dialog of input text size
-                            if(textToDisplay.isNotEmpty()) {
+                            if (textToDisplay.isNotEmpty()) {
                                 showFontSizeDialog = true
                             }
                         }
@@ -883,7 +959,7 @@ fun TextDragApp() {
             // + Button
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) {
+                    if (textToDisplay.isNotEmpty()) {
                         saveActionState()
                         fontSize = (fontSize.value + 2).sp
                         vibrate()
@@ -903,7 +979,7 @@ fun TextDragApp() {
             // Reset text size button
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) {
+                    if (textToDisplay.isNotEmpty()) {
                         if (fontSize != 20.sp)
                             saveActionState()
                         fontSize = 20.sp
@@ -931,7 +1007,7 @@ fun TextDragApp() {
         Spacer(modifier = Modifier.height(5.dp))
 
         // Text size seekbar slider
-        if(showSlider && textToDisplay.isNotEmpty()) {
+        if (showSlider && textToDisplay.isNotEmpty()) {
             Column(modifier = Modifier.padding(horizontal = 20.dp)) {
                 Slider(
                     enabled = if (textToDisplay.isNotEmpty()) true else false,
@@ -947,7 +1023,7 @@ fun TextDragApp() {
                     },
                     colors = SliderDefaults.colors(
                         thumbColor = Color.Black,
-                        activeTrackColor = if(isDarkMode) Color.White else Color.Black,
+                        activeTrackColor = if (isDarkMode) Color.White else Color.Black,
                         inactiveTrackColor = Color.Gray
                     ),
                     thumb = { // show font size inside the thumb
@@ -989,7 +1065,7 @@ fun TextDragApp() {
             // Black color
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) changeTextColor(Color.Black)
+                    if (textToDisplay.isNotEmpty()) changeTextColor(Color.Black)
                 },
                 colors = ButtonDefaults.buttonColors(Color.Black),
                 shape = CircleShape,
@@ -1009,7 +1085,7 @@ fun TextDragApp() {
             // White color
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) changeTextColor(Color.White)
+                    if (textToDisplay.isNotEmpty()) changeTextColor(Color.White)
                 },
                 colors = ButtonDefaults.buttonColors(Color.White),
                 shape = CircleShape,
@@ -1029,7 +1105,7 @@ fun TextDragApp() {
             // Light Gray color
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) changeTextColor(Color.LightGray)
+                    if (textToDisplay.isNotEmpty()) changeTextColor(Color.LightGray)
                 },
                 colors = ButtonDefaults.buttonColors(Color.LightGray),
                 shape = CircleShape,
@@ -1049,7 +1125,7 @@ fun TextDragApp() {
             // Gray color
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) changeTextColor(Color.Gray)
+                    if (textToDisplay.isNotEmpty()) changeTextColor(Color.Gray)
                 },
                 colors = ButtonDefaults.buttonColors(Color.Gray),
                 shape = CircleShape,
@@ -1077,7 +1153,7 @@ fun TextDragApp() {
             // Red color
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) changeTextColor(Color.Red)
+                    if (textToDisplay.isNotEmpty()) changeTextColor(Color.Red)
                 },
                 colors = ButtonDefaults.buttonColors(Color.Red),
                 shape = CircleShape,
@@ -1096,7 +1172,7 @@ fun TextDragApp() {
             // Yellow color
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) changeTextColor(Color.Yellow)
+                    if (textToDisplay.isNotEmpty()) changeTextColor(Color.Yellow)
                 },
                 colors = ButtonDefaults.buttonColors(Color.Yellow),
                 shape = CircleShape,
@@ -1114,7 +1190,7 @@ fun TextDragApp() {
             // Orange color - FF8000
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) changeTextColor(Color(0xFFFF8000))
+                    if (textToDisplay.isNotEmpty()) changeTextColor(Color(0xFFFF8000))
                 },
                 colors = ButtonDefaults.buttonColors(Color(0xFFFF8000)),
                 shape = CircleShape,
@@ -1133,7 +1209,7 @@ fun TextDragApp() {
             // Blue color
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) changeTextColor(Color.Blue)
+                    if (textToDisplay.isNotEmpty()) changeTextColor(Color.Blue)
                 },
                 colors = ButtonDefaults.buttonColors(Color.Blue),
                 shape = CircleShape,
@@ -1152,7 +1228,7 @@ fun TextDragApp() {
             // Cyan color
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) changeTextColor(Color.Cyan)
+                    if (textToDisplay.isNotEmpty()) changeTextColor(Color.Cyan)
                 },
                 colors = ButtonDefaults.buttonColors(Color.Cyan),
                 shape = CircleShape,
@@ -1171,7 +1247,7 @@ fun TextDragApp() {
             // Green color - 00CC00
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) changeTextColor(Color(0xFF00CC00))
+                    if (textToDisplay.isNotEmpty()) changeTextColor(Color(0xFF00CC00))
                 },
                 colors = ButtonDefaults.buttonColors(Color(0xFF00CC00)),
                 shape = CircleShape,
@@ -1190,7 +1266,7 @@ fun TextDragApp() {
             // Magenta color
             Button(
                 onClick = {
-                    if(textToDisplay.isNotEmpty()) changeTextColor(Color.Magenta)
+                    if (textToDisplay.isNotEmpty()) changeTextColor(Color.Magenta)
                 },
                 colors = ButtonDefaults.buttonColors(Color.Magenta),
                 shape = CircleShape,
@@ -1327,7 +1403,7 @@ fun DropdownButton(
     var expanded by remember { mutableStateOf(false) }
     Box {
         Button(
-            onClick = { if(textToDisplay.isNotEmpty()) expanded = !expanded },
+            onClick = { if (textToDisplay.isNotEmpty()) expanded = !expanded },
             colors = ButtonDefaults.buttonColors(Color.Black),
             border = BorderStroke(0.5.dp, Color.White)
         ) {
