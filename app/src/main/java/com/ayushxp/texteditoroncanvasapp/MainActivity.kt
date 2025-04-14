@@ -23,9 +23,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -36,10 +38,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -93,6 +98,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextDragApp() {
 
@@ -124,6 +130,7 @@ fun TextDragApp() {
     var showFontSizeDialog by remember { mutableStateOf(false) }
     var inputFontSize by remember { mutableStateOf(fontSize.value.toInt().toString()) }
     var inputFontSizeError by remember { mutableStateOf<String?>(null) }
+    var showSlider by remember { mutableStateOf(false) }
 
     // Canvas Color & Text Color - states
     var canvasCol by remember { mutableStateOf(Color.LightGray) }
@@ -809,6 +816,29 @@ fun TextDragApp() {
         // Text Size Controls - +, size display & reset
         Row(verticalAlignment = Alignment.CenterVertically) {
 
+            // Slider visibility toggle icon button
+            Icon(
+                painter = painterResource(id = R.drawable.slidericon),
+                tint = if(isDarkMode) Color.White else Color.Black,
+                contentDescription = "Slider Visibility",
+                modifier = Modifier.clickable(
+                    enabled = true,
+                    onClickLabel = "Slider Visibility",
+                    role = Role.Button,
+                    onClick = {
+                        if(textToDisplay.isNotEmpty()) {
+                            if(showSlider == false) {
+                                saveActionState()
+                            }
+                            showSlider = !showSlider
+                            vibrate()
+                        }
+                    }
+                ).size(35.dp)
+            )
+
+            Spacer(modifier = Modifier.size(15.dp))
+
             // - Button
             Button(
                 onClick = {
@@ -893,8 +923,57 @@ fun TextDragApp() {
                         tint = Color.White
                     )
                     Spacer(modifier = Modifier.size(5.dp))
-                    Text("Reset size", fontSize = 16.sp, color = Color.White)
+                    Text("Reset", fontSize = 16.sp, color = Color.White)
                 }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        // Text size seekbar slider
+        if(showSlider && textToDisplay.isNotEmpty()) {
+            Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+                Slider(
+                    enabled = if (textToDisplay.isNotEmpty()) true else false,
+                    value = fontSize.value,
+                    valueRange = 5f..200f,
+                    onValueChange = {
+                        fontSize = it.sp
+                    },
+                    onValueChangeFinished = {
+                        saveActionState()
+                        fontSize = (fontSize.value).sp
+                        vibrate()
+                    },
+                    colors = SliderDefaults.colors(
+                        thumbColor = Color.Black,
+                        activeTrackColor = if(isDarkMode) Color.White else Color.Black,
+                        inactiveTrackColor = Color.Gray
+                    ),
+                    thumb = { // show font size inside the thumb
+                        Box(
+                            modifier = Modifier
+                                .size(width = 45.dp, height = 30.dp)
+                                .background(
+                                    color = if (textToDisplay.isNotEmpty()) Color.Black else Color.Gray,
+                                    shape = RoundedCornerShape(25.dp)
+                                ).border(
+                                    // border with rounded corner shape
+                                    width = 1.dp,
+                                    color = if (isDarkMode) Color.White else Color.Transparent,
+                                    shape = RoundedCornerShape(25.dp)
+                                )
+                                .padding(horizontal = 5.dp)
+                        ) {
+                            Text(
+                                text = fontSize.value.toInt().toString(),
+                                fontSize = 14.sp,
+                                color = Color.White,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                    }
+                )
             }
         }
 
@@ -1180,11 +1259,11 @@ fun TextDragApp() {
                                 inputFontSize = newValue.text // Update raw text
                                 inputFontSizeError = when {
                                     newValue.text.toIntOrNull() == null -> "Invalid number"
-                                    newValue.text.toIntOrNull() !in 1..200 -> "Enter a number between 1 to 200 only."
+                                    newValue.text.toIntOrNull() !in 5..200 -> "Enter a number between 5 to 200 only."
                                     else -> null
                                 }
                             },
-                            label = { Text("1 to 200") },
+                            label = { Text("5 to 200") },
                             isError = inputFontSizeError != null,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier // Request focus when the dialog appears
@@ -1206,12 +1285,12 @@ fun TextDragApp() {
                 },
                 confirmButton = {
                     IconButton(onClick = {
-                        if (inputFontSize.toIntOrNull() in 1..200) {
+                        if (inputFontSize.toIntOrNull() in 5..200) {
                             saveActionState()
                             fontSize = inputFontSize.toInt().sp
                             showFontSizeDialog = false
                         } else {
-                            inputFontSizeError = "Enter a number between 1 to 200 only."
+                            inputFontSizeError = "Enter a number between 5 to 200 only."
                         }
                     }) {
                         Icon(imageVector = Icons.Default.Check, contentDescription = "Confirm")
