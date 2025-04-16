@@ -6,19 +6,46 @@
 
 #### An Android app to create, edit or modify text upon a square canvas. It can be used to create personalized text-based designs or to write some Quotes. </br>
 
-This is a Single Activity App :- &nbsp; ***[MainActivity.kt](app/src/main/java/com/ayushxp/texteditoroncanvasapp/MainActivity.kt)** &nbsp;(~1300 lines)*
+This is a Single Activity App :- &nbsp; ***[MainActivity.kt](app/src/main/java/com/ayushxp/texteditoroncanvasapp/MainActivity.kt)** &nbsp;(~1800 lines)*
 
 - <p><b>Download & Test the app in your phone ⬇️</b> </br>
 
     - Get App directly to your Email account via Firebase App distribution :-
-      https://appdistribution.firebase.google.com/testerapps/1:226247968382:android:d30be6b18985dbf0c23a2f/releases/11rh6hgdk0dv0?utm_source=firebase-console
+      https://appdistribution.firebase.google.com/testerapps/1:226247968382:android:d30be6b18985dbf0c23a2f/releases/76nl45dus520o?utm_source=firebase-console
 
     - Download Apk via github releases :-
-      https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.1.0
+      https://github.com/ayushpadlekar/Text_Editor_On_Canvas/releases/tag/v1.2.0
 
 </p>
 
 </br>
+
+## Features 💡
+
+* Add and Edit text on a square canvas.
+* Drag/Move text anywhere upon canvas.
+* Choose fonts - serif, sans-serif, monospace, cursive.
+* Format text - bold, italic, underline, strikethrough.
+* Change text size with (+ -) buttons or slider.
+* Change Text Colors.
+* Change canvas colors - white | black | gray.
+* Undo - Redo functionality.
+* Dark mode - Light mode.
+* Save/Export canvas as png Image.
+
+
+## Screenshots 📸
+
+<table>
+<tr align = "center">
+    <td>Light Mode ☀️</td>
+    <td>Dark Mode 🌙</td>
+</tr>
+<tr>
+    <td><img src="screenshots\TE Canvas UI - Light mode.png" width=300></td>
+    <td><img src="screenshots\TE Canvas UI - Dark mode.png" width=300></td>
+</tr>
+</table>
 
 > [!NOTE]
 > *- This app was made as an assignment for an insternship. </br> - The main challenge of the assignment was : to make the Text stay inside of the square canvas. It should not go outside the boundary whenever we drag or move the text.* </br>
@@ -39,30 +66,6 @@ This is a Single Activity App :- &nbsp; ***[MainActivity.kt](app/src/main/java/c
 
 </br>
 
-## Features 💡
-
-* Add and edit text on a square canvas.
-* Drag/Move text anywhere upon canvas.
-* Customize fonts, size, and color of text.
-* Format text - bold, italic, underline, strikethrough.
-* Change canvas color - white/black/gray.
-* Undo & Redo functionality.
-* Dark Mode option.
-
-
-## Screenshots 📸
-
-<table>
-<tr align = "center">
-    <td>Light Mode ☀️</td>
-    <td>Dark Mode 🌙</td>
-</tr>
-<tr>
-    <td><img src="screenshots\TE Canvas UI - Light mode.png" width=300></td>
-    <td><img src="screenshots\TE Canvas UI - Dark mode.png" width=300></td>
-</tr>
-</table>
-
 
 ## Tech Stack 🛠️
 
@@ -71,6 +74,8 @@ This is a Single Activity App :- &nbsp; ***[MainActivity.kt](app/src/main/java/c
 * **Kotlin :** Utilized as the primary programming language for the app. Created dynamic features with mutable states & undo redo stacks management.
 
 * **Android Studio :** IDE for developing this app.
+
+* **Firebase App Distribution :** For Deploying app to the users.
 
 
 ## Contributing
