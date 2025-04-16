@@ -267,7 +267,7 @@ fun TextDragApp() {
         }
     }
 
-    // Vibrations on button click ------------------------------------------
+    // Vibrations on button click ------------------------------------------------------
     val vibrator: Vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val vibratorManager: VibratorManager =
             LocalContext.current.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
@@ -295,7 +295,7 @@ fun TextDragApp() {
     val captureController = rememberCaptureController()
     val uiScope = rememberCoroutineScope()
 
-    // Modified save function
+    // Save to gallery function
     suspend fun saveImageToGallery(context: Context, bitmap: ImageBitmap): Uri {
         return withContext(Dispatchers.IO) {
 
@@ -347,7 +347,6 @@ fun TextDragApp() {
                 exportStatus = ExportStatus.Error(e.message ?: "Unknown error")
             }
         }
-
 //        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
 //            when (permissionState.status) {
 //                is PermissionStatus.Granted -> proceedWithExport()
@@ -375,7 +374,7 @@ fun TextDragApp() {
         Spacer(modifier = Modifier.height(55.dp))
 
 
-        // Customized App Name & DarkMode Icon Button
+        // Customized App Name | DarkMode Icon Button
         Row(verticalAlignment = Alignment.CenterVertically) {
 
             Spacer(modifier = Modifier.size(10.dp))
@@ -505,7 +504,7 @@ fun TextDragApp() {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Canvas Colors : Grey, White, Black & Undo, Redo Buttons
+        // Save Button | Canvas Colors: Grey, White, Black | Undo, Redo Buttons
         Row(verticalAlignment = Alignment.CenterVertically)
         {
             // Save button
@@ -1069,7 +1068,7 @@ fun TextDragApp() {
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // Text Size Controls - +, size display & reset
+        // Slider Toggle button | Text Size Controls - + | Text Size Display | Reset
         Row(verticalAlignment = Alignment.CenterVertically) {
 
             // Slider visibility toggle icon button
@@ -1186,7 +1185,7 @@ fun TextDragApp() {
 
         Spacer(modifier = Modifier.height(5.dp))
 
-        // Text size seekbar slider
+        // Slider/Seekbar for Text size control
         if (showSlider && textToDisplay.isNotEmpty()) {
             Column(modifier = Modifier.padding(horizontal = 20.dp)) {
                 Slider(
@@ -1568,7 +1567,6 @@ fun TextDragApp() {
         }
 
         // Export Canvas as Image Dialog
-        // Modified Export Dialog
         if (showExportDialog) {
             when (val status = exportStatus) {
                 ExportStatus.Loading -> {
@@ -1643,9 +1641,6 @@ fun TextDragApp() {
 }
 
 
-
-
-// Add this function outside composable
 private fun shareImage(context: Context, uri: Uri) {
     val shareIntent = Intent().apply {
         action = Intent.ACTION_SEND
