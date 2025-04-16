@@ -1,6 +1,8 @@
 package com.ayushxp.texteditoroncanvasapp
 
+import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
@@ -87,6 +89,33 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.*
+// for Export as image feature
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.PermissionStatus
+import dev.shreyaspatil.capturable.capturable
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.IOException
+import androidx.core.graphics.scale
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,7 +127,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class,
+    ExperimentalComposeUiApi::class, ExperimentalComposeApi::class
+)
 @Composable
 fun TextDragApp() {
 
@@ -236,7 +267,7 @@ fun TextDragApp() {
         }
     }
 
-    // Vibrations on button click ------------
+    // Vibrations on button click ------------------------------------------
     val vibrator: Vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val vibratorManager: VibratorManager =
             LocalContext.current.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
@@ -245,7 +276,6 @@ fun TextDragApp() {
         @Suppress("DEPRECATION")  // backward compatibility for Android API < 31
         LocalContext.current.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     }
-
     fun vibrate() {  // Vibrate Function ------------
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             vibrator.vibrate(VibrationEffect.createOneShot(40, VibrationEffect.DEFAULT_AMPLITUDE))
@@ -253,6 +283,85 @@ fun TextDragApp() {
             vibrator.vibrate(40)
         }
     }
+
+
+    // Export Canvas as Image Feature -------------------------------------------------------------
+    var showExportDialog by remember { mutableStateOf(false) }
+    var exportStatus by remember { mutableStateOf<ExportStatus>(ExportStatus.Idle) }
+    val context = LocalContext.current
+    val permissionState = rememberPermissionState(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    //var canvasBitmapState = remember { mutableStateOf<ImageBitmap?>(null) }
+    var canvasBitmapState: ImageBitmap? by remember { mutableStateOf(null) }
+    val captureController = rememberCaptureController()
+    val uiScope = rememberCoroutineScope()
+
+    // Modified save function
+    suspend fun saveImageToGallery(context: Context, bitmap: ImageBitmap): Uri {
+        return withContext(Dispatchers.IO) {
+
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, "TE_Canvas_${System.currentTimeMillis()}.png")
+                put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/TE_Canvas")
+                }
+            }
+
+            context.contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                contentValues
+            )?.also { uri ->
+                context.contentResolver.openOutputStream(uri)?.use { stream ->
+                    bitmap.asAndroidBitmap().scale(1920, 1920).compress(Bitmap.CompressFormat.PNG, 100, stream)
+                }
+            } ?: throw IOException("Failed to create new MediaStore record")
+        }
+    }
+
+    suspend fun proceedWithExport() {
+        try {
+            canvasBitmapState?.let { bitmap ->
+                val uri = saveImageToGallery(context, bitmap)
+                exportStatus = ExportStatus.Success(uri)
+            } ?: run {
+                exportStatus = ExportStatus.Error("Canvas content not available")
+            }
+        } catch (e: Exception) {
+            exportStatus = ExportStatus.Error(e.message ?: "Unknown error")
+        }
+    }
+
+    // Export click handler
+    fun handleExportClick() {
+        if (textToDisplay.isEmpty()) return
+
+        showExportDialog = true
+        exportStatus = ExportStatus.Loading
+
+        uiScope.launch {
+            try {
+                val bitmap = captureController.captureAsync().await()
+                canvasBitmapState = bitmap
+                proceedWithExport()
+            } catch (e: Exception) {
+                exportStatus = ExportStatus.Error(e.message ?: "Unknown error")
+            }
+        }
+
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+//            when (permissionState.status) {
+//                is PermissionStatus.Granted -> proceedWithExport()
+//                is PermissionStatus.Denied -> {
+//                    exportStatus = ExportStatus.Error("Storage permission required")
+//                    permissionState.launchPermissionRequest()
+//                }
+//            }
+//        } else {
+//            proceedWithExport()
+//        }
+    }
+
+
 
 //--------------------------------------------------------------------------------------------------
 
@@ -399,9 +508,62 @@ fun TextDragApp() {
         // Canvas Colors : Grey, White, Black & Undo, Redo Buttons
         Row(verticalAlignment = Alignment.CenterVertically)
         {
-            Text("Canvas :", fontSize = 18.sp, color = infoTextCol)
+            // Save button
+            Button(
+                onClick = {
+                    handleExportClick()
+                    vibrate()
+                },
+                colors = if (textToDisplay.isEmpty()) {
+                    if (isDarkMode) {
+                        ButtonDefaults.buttonColors(Color.Black)
+                    } else {
+                        ButtonDefaults.buttonColors(Color.Gray)
+                    }
+                } else {
+                    ButtonDefaults.buttonColors(Color.Black)
+                },
+                border = BorderStroke(
+                    0.5.dp,
+                    if (isDarkMode)
+                        if (textToDisplay.isEmpty())
+                            Color.Gray
+                        else
+                            Color.White
+                    else
+                        Color.White
+                ),
+                contentPadding = PaddingValues(start = 10.dp, end = 16.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_download_24),
+                        contentDescription = "Export/Download as image",
+                        tint = if (isDarkMode)
+                            if (textToDisplay.isEmpty())
+                                Color.Gray
+                            else
+                                Color.White
+                        else
+                            Color.White
+                    )
+                    Spacer(modifier = Modifier.size(5.dp))
+                    Text("Save",
+                        fontSize = 16.sp,
+                        color = if (isDarkMode)
+                            if (textToDisplay.isEmpty())
+                                Color.Gray
+                            else
+                                Color.White
+                        else
+                            Color.White
+                    )
+                }
+            }
 
-            Spacer(modifier = Modifier.size(10.dp))
+            Spacer(modifier = Modifier.size(15.dp))
 
             // Gray button pre-selected
             Button(
@@ -528,7 +690,25 @@ fun TextDragApp() {
                 )
                 .onGloballyPositioned { coordinates ->
                     boxSize = coordinates.size
-                },
+                }
+                .capturable(captureController),
+//                .graphicsLayer {
+//                    // This makes the composable captureable
+//                    compositingStrategy = CompositingStrategy.Offscreen
+//                }
+//                .drawWithContent {
+//                    // We'll use this to capture the canvas
+////                    val graphicsLayer = rememberGraphicsLayer()
+////                    // call record to capture the content in the graphics layer
+////                    graphicsLayer.record {
+////                        // draw the contents of the composable into the graphics layer
+////                        this@drawWithContent.drawContent()
+////                    }
+////                    // draw the graphics layer on the visible canvas
+////                    drawLayer(graphicsLayer)
+//                    drawContent()
+//                    canvasBitmapState.value = toImageBitmap()
+//                },
             contentAlignment = Alignment.TopStart
         ) {
             if (textToDisplay.isNotEmpty()) {
@@ -1386,10 +1566,107 @@ fun TextDragApp() {
                 keyboardController?.show()
             }
         }
+
+        // Export Canvas as Image Dialog
+        // Modified Export Dialog
+        if (showExportDialog) {
+            when (val status = exportStatus) {
+                ExportStatus.Loading -> {
+                    AlertDialog(
+                        onDismissRequest = { showExportDialog = false },
+                        title = { Text("Exporting...") },
+                        text = {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                CircularProgressIndicator()
+                                Spacer(Modifier.height(16.dp))
+                                Text("Saving image to gallery...")
+                            }
+                        },
+                        confirmButton = {}
+                    )
+                }
+
+                is ExportStatus.Success -> {
+                    AlertDialog(
+                        onDismissRequest = { showExportDialog = false },
+                        title = { Text("Success!") },
+                        text = { Text("Image saved successfully! \n\nPath: /Internal storage/Pictures/TE_Canvas") },
+                        confirmButton = {
+                            Button(
+                                onClick = { showExportDialog = false },
+                                colors = ButtonDefaults.buttonColors(Color.Black)
+                            ) {
+                                Text("OK")
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                onClick = {
+                                    shareImage(context, status.uri)
+                                    showExportDialog = false
+                                },
+                                colors = ButtonDefaults.buttonColors(Color.Black)
+                            ) {
+                                // Share icon & share text
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(imageVector = Icons.Default.Share, contentDescription = "Share icon")
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("Share")
+                                }
+                            }
+                        }
+                    )
+                }
+
+                is ExportStatus.Error -> {
+                    AlertDialog(
+                        onDismissRequest = { showExportDialog = false },
+                        title = { Text("Error") },
+                        text = { Text(status.message) },
+                        confirmButton = {
+                            Button(
+                                onClick = { showExportDialog = false },
+                                colors = ButtonDefaults.buttonColors(Color.Black)
+                            ) {
+                                Text("OK")
+                            }
+                        }
+                    )
+                }
+
+                ExportStatus.Idle -> Unit
+            }
+        }
     }
 
 
 }
+
+
+
+
+// Add this function outside composable
+private fun shareImage(context: Context, uri: Uri) {
+    val shareIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_STREAM, uri)
+        type = "image/png"
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    context.startActivity(Intent.createChooser(shareIntent, "Share Image"))
+}
+
+sealed class ExportStatus {
+    object Idle : ExportStatus()
+    object Loading : ExportStatus()
+    data class Success(val uri: Uri) : ExportStatus()
+    data class Error(val message: String) : ExportStatus()
+}
+
+// Extension function to convert ImageBitmap to Android Bitmap
+//fun ImageBitmap.toAndroidBitmap(): Bitmap {
+//    return this.asAndroidBitmap()
+//}
 
 
 @Composable
